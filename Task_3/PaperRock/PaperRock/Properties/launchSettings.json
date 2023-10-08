@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PaperRock": {
+      "commandName": "Project",
+      "commandLineArgs": "rock Spock pape "
+    }
+  }
+}
