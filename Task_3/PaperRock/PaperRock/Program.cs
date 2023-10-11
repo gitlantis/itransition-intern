@@ -8,15 +8,20 @@ var menu = new Menu(args, winners);
 menu.AnalyseInputs();
 winners.SetArguments(menu.Items);
 
-var hmac = crypto.ComputeSHA256Hash(String.Join("", menu.Items));
 
-Console.WriteLine($"HMAC: {hmac}");
 Console.WriteLine("Available moves:");
 
 menu.PrintMoves();
 
 while (true)
 {
+    var (computerChoiceStr, computerChoice) = process.ComputersChoice(menu.Items);
+
+    var key = crypto.GeneratKey(64);
+    var hmac = crypto.EncryptMessage(key, computerChoiceStr);
+
+    Console.WriteLine($"HMAC: {hmac}");
+
     Console.Write("Enter your move: ");
     var userCharChoice = Console.ReadLine();
 
@@ -27,19 +32,17 @@ while (true)
 
         if (menu.Range(userChoice))
         {
-            var (computerChoiceStr, computerChoice) = process.ComputersChoice(menu.Items);
 
             Console.WriteLine($"Your move: {userStrChoice}");
             Console.WriteLine($"Computer move: {computerChoiceStr}");
 
             var (message, result) = process.DetectWinner(menu.Items, userChoice, computerChoice);
             Console.WriteLine(message);
-            var newKey = hmac + computerChoice;
-            var newHmac = crypto.ComputeSHA256Hash(newKey);
-            Console.WriteLine($"HMAC key: {newHmac}");
             var winnersMessage = winners.AddWinner(userChoice, computerChoice, result);
             Console.WriteLine(winnersMessage);
         }
+        Console.WriteLine($"HMAC key: {key}");
+        Console.WriteLine();
     }
     catch (Exception e)
     {

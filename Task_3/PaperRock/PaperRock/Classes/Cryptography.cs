@@ -1,7 +1,9 @@
 ﻿using SHA3.Net;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,12 +22,32 @@ namespace PaperRock.Classes
             return sOutput.ToString();
         }
 
-        public string ComputeSHA256Hash(string text)
+        public string GeneratKey(int len)
         {
-            using (var shaAlg = Sha3.Sha3256())
+            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var stringChars = new char[len];
+            var random = new Random();
+
+            for (int i = 0; i < stringChars.Length; i++)
             {
-                var hash = shaAlg.ComputeHash(Encoding.UTF8.GetBytes(text));
-                return ByteArrayToString(hash);
+                stringChars[i] = chars[random.Next(chars.Length)];
+            }
+
+            var randomStr = new String(stringChars);
+            return randomStr;
+
+        }
+        public string EncryptMessage(string key, string message)
+        {
+            using (var hmac = new HMACSHA256(Encoding.ASCII.GetBytes(key)))
+            {
+                byte[] hashValue = hmac.ComputeHash(Encoding.ASCII.GetBytes(message));
+                var builder = new StringBuilder();
+                for (int i = 0; i < hashValue.Length; i++)
+                {
+                    builder.Append(hashValue[i].ToString("x2"));
+                }
+                return builder.ToString();
             }
         }
     }
