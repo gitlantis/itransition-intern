@@ -23,20 +23,14 @@ namespace PaperRock.Classes
         }
 
         public string GeneratKey(int len)
-        {
-            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            var stringChars = new char[len];
-            var random = new Random();
-
-            for (int i = 0; i < stringChars.Length; i++)
-            {
-                stringChars[i] = chars[random.Next(chars.Length)];
-            }
-
-            var randomStr = new String(stringChars);
-            return randomStr;
-
+        {            
+            var randomGenerator = RandomNumberGenerator.Create();
+            byte[] data = new byte[len];
+            randomGenerator.GetBytes(data);
+            var result = BitConverter.ToString(data).Replace("-", "");
+            return result;
         }
+
         public string EncryptMessage(string key, string message)
         {
             using (var hmac = new HMACSHA256(Encoding.ASCII.GetBytes(key)))

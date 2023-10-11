@@ -17,7 +17,7 @@ while (true)
 {
     var (computerChoiceStr, computerChoice) = process.ComputersChoice(menu.Items);
 
-    var key = crypto.GeneratKey(64);
+    var key = crypto.GeneratKey(32);
     var hmac = crypto.EncryptMessage(key, computerChoiceStr);
 
     Console.WriteLine($"HMAC: {hmac}");
