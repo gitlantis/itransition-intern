@@ -2,3 +2,5 @@
 **/obj
 **/publish
 **/.vs
+**/dist
+**/Migrations

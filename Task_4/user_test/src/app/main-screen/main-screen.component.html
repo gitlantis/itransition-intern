@@ -1,0 +1,67 @@
+<nav class="m-2">
+  <div class="container">
+    <div class="d-flex justify-content-end">
+      <h4 class="modal-title px-2" id="modal-basic-title">{{ userName }}</h4>
+      <a class="btn border float-right" (click)="logOut()"
+        ><i class="fa fa-sign-out" aria-hidden="true"></i>Log out</a
+      >
+    </div>
+  </div>
+</nav>
+
+<div class="row justify-content-center align-items-center">
+  <div class="col-8">
+    <a class="btn btn-secondary" (click)="blockAction()"
+      ><i class="fa fa-lock"></i> Block</a
+    >
+    <a class="btn btn-primary" (click)="unlockAction()"
+      ><i class="fa fa-unlock"></i> Unlock</a
+    >
+    <a class="btn btn-danger" (click)="deleteAction()"
+      ><i class="fa fa-trash"></i> Delete</a
+    >
+  </div>
+</div>
+<div class="row justify-content-center align-items-center">
+  <div class="col-8">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">
+            <input
+              class="form-check-input m-2"
+              type="checkbox"
+              value=""
+              (change)="checkValuesChange()"
+              id="defaultCheck1"
+            />
+          </th>
+          <th scope="col">Full name</th>
+          <th scope="col">Username</th>
+          <th scope="col">e-Mail</th>
+          <th scope="col">Last login</th>
+          <th scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody *ngFor="let user of users">
+        <tr [ngClass]="user.isBlocked ? 'table-active' : ''">
+          <th scope="col">
+            <input
+              class="form-check-input m-2 activationCheck"
+              type="checkbox"
+              name="activationCheck"
+              (click)="checkedBox(user.userGuid)"
+              [checked]="checked"
+            />
+          </th>
+          <td>{{ user.firstName }} {{ user.lastName }}</td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.editedDate }}</td>
+          <td *ngIf="user.isBlocked">Blocked</td>
+          <td *ngIf="!user.isBlocked">Active</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
