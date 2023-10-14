@@ -83,6 +83,10 @@ export class MainScreenComponent implements OnInit {
           var userIndex = this.users.findIndex(c => {
             return c.userGuid === element;
           });
+
+          if (this.users[userIndex].username === this.userName)
+            this.router.navigateByUrl('/login');
+
           this.users[userIndex].isBlocked = true;
         });
       },
@@ -99,6 +103,7 @@ export class MainScreenComponent implements OnInit {
           var userIndex = this.users.findIndex(c => {
             return c.userGuid === element;
           });
+
           this.users[userIndex].isBlocked = false;
         });
       },

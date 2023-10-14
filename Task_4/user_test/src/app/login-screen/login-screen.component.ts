@@ -19,8 +19,6 @@ export class LoginScreenComponent implements OnInit {
   }
 
   onSubmit(form: NgForm) {
-
-    console.log(form.value);
     var res = this.authService.login(form.value)
   }
 
