@@ -27,7 +27,8 @@ export class AuthService extends BaseService {
           var result = res as any;
           CacheHelper.setUsername(result['username']);
           CacheHelper.setToken(result['token'])
-          this.router.navigateByUrl('/main');
+          if (result['token'].length > 0)
+            this.router.navigateByUrl('/main');
           return true;
         } else {
           this.toastr.error("Check username and password again", 'Auth error!');

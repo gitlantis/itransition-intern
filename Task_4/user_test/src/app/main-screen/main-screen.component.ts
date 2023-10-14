@@ -112,12 +112,14 @@ export class MainScreenComponent implements OnInit {
     this.userService.deleteUsers(this.sendingList).subscribe(
       res => {
         this.toastr.success('Users deleted successfully', 'Success!');
+
         this.sendingList.forEach(element => {
           var userIndex = this.users.findIndex(c => {
             return c.userGuid === element;
           });
 
-          this.users.splice(userIndex, 1);
+          if (this.users[userIndex].username === this.userName)
+            this.router.navigateByUrl('/login');
         });
       },
       err => {
