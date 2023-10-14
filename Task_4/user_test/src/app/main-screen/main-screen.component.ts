@@ -3,7 +3,6 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from 'src/services/auth.service';
 import { UserService } from 'src/services/user.service';
 import { Constants } from 'src/constants';
-import { HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { CacheHelper } from 'src/helpers/cache-helper';
 import { UserPost } from 'src/helpers/auth/userpost.model';
@@ -40,7 +39,7 @@ export class MainScreenComponent implements OnInit {
           res.forEach((item, idx) => {
             this.tmpValues[idx] = item.userGuid;
           });
-        });
+        }, err => this.router.navigateByUrl('/login'));
       this.sendingList = this.sendingList.filter(this.onlyUnique);
     } else this.router.navigateByUrl('/login');
 
@@ -120,7 +119,9 @@ export class MainScreenComponent implements OnInit {
 
           if (this.users[userIndex].username === this.userName)
             this.router.navigateByUrl('/login');
+          this.users.splice(userIndex, 1);
         });
+        this.sendingList = []
       },
       err => {
         this.toastr.error('An error accured during the processing a request', 'Data error!');
