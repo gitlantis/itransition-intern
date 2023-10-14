@@ -52,6 +52,9 @@ export class UserService extends BaseService {
             this.toastr.error("An error occured during registration", 'Registration error!');
             return false;
           }
+        },
+        error => {
+          this.toastr.error("An error occured during registration", 'Registration error!');
         });
     else return false;
   }

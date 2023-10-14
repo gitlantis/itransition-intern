@@ -31,8 +31,9 @@ export class MainScreenComponent implements OnInit {
 
   datacount = 0;
   ngOnInit(): void {
-    this.userName = (CacheHelper.getUsername() as string);
-    if (CacheHelper.getToken().length > 3)
+    if (CacheHelper.getToken().length > 3) {
+      this.userName = (CacheHelper.getUsername() as string);
+
       this.userService.getUsers().subscribe(
         res => {
           this.users = res;
@@ -40,7 +41,9 @@ export class MainScreenComponent implements OnInit {
             this.tmpValues[idx] = item.userGuid;
           });
         });
-    this.sendingList = this.sendingList.filter(this.onlyUnique);
+      this.sendingList = this.sendingList.filter(this.onlyUnique);
+    } else this.router.navigateByUrl('/login');
+
   }
 
   checkValuesChange() {

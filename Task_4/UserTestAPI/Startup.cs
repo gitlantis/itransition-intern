@@ -27,7 +27,6 @@ namespace UserTestMonnitorAPI
         public IConfiguration Configuration { get; }
         public IServiceCollection Collection { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             string ngsqlConnectionStr = Configuration.GetConnectionString("PgsDB");
