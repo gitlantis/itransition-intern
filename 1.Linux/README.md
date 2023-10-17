@@ -174,8 +174,8 @@ fi
 
 threshold_percent=20
 threshold_days=30
-log_warn="/var/log/disk_logger_warn.txt"
-log_clean="/var/log/disk_logger_clean.txt"
+log_warn="/var/log/disk_logger_warn.log"
+log_clean="/var/log/disk_logger_clean.log"
 
 clean_files_dirs=("/var/log" "/tmp")
 disks="$(df -H --output=source,target | grep -E -w -v 'none' | grep -oE '/mnt/[^ ]+')"

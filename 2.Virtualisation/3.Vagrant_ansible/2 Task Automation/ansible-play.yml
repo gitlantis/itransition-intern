@@ -1,0 +1,61 @@
+---
+# on first server installing nginx with shell paramaters
+- name: prepearing on vm01
+  hosts: vm1
+  remote_user: vagrant
+  become: yes # run as admin
+  tasks:
+    - name: install web server nginx
+      apt: name=nginx update_cache=yes state=latest
+
+    - name: start nginx
+      service:
+        name: nginx
+        state: started
+
+    - name: copy script from the local machine to the remote server
+      copy:
+        src: patrul-script.sh
+        dest: ~/patrul-script.sh
+      become_user: vagrant
+      become_method: sudo
+
+    - name: set execute permissions on the script
+      file:
+        path: patrul-script.sh
+        mode: 0755
+
+    - name: schedule a cron job
+      cron:
+        name: tmp_size_patrul
+        hour: 2
+        job: "~/patrul-script.sh -p 20 -d 1"
+      become: true
+
+# on second server installing Apache with yaml parameters
+- name: prepearing on vm02
+  hosts: vm2
+  remote_user: vagrant
+  become: yes # run as admin
+  tasks:
+    - name: Installs apache web server
+      apt: name=apache2 update_cache=yes state=latest
+
+    - name: copy script from the local machine to the remote server
+      copy:
+        src: patrul-script.sh
+        dest: ~/patrul-script.sh
+      become_user: vagrant
+      become_method: sudo
+
+    - name: set execute permissions on the script
+      file:
+        path: patrul-script.sh
+        mode: 0755
+
+    - name: schedule a cron job
+      cron:
+        name: tmp_size_patrul
+        hour: 2
+        job: "~/patrul-script.sh -p 20 -d 1"
+      become: true

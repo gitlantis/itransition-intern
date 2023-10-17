@@ -1,0 +1,45 @@
+---
+# on first server installing nginx with shell paramaters
+- name: prepearing on vm01
+  hosts: vm1
+  remote_user: vagrant
+  become: yes # run as admin
+  tasks:
+    - name: install web server nginx
+      apt: name=nginx update_cache=yes state=latest
+
+    - name: start nginx
+      service:
+        name: nginx
+        state: started
+
+    - name: add new user
+      user:
+        name: betty
+        groups: sudo
+        shell: /bin/bash
+
+    - name: add ssh key
+      authorized_key:
+        user: betty
+        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+# on second server installing Apache with yaml parameters
+- name: prepearing on vm02
+  hosts: vm2
+  remote_user: vagrant
+  become: yes # run as admin
+  tasks:
+    - name: Installs apache web server
+      apt: name=apache2 update_cache=yes state=latest
+
+    - name: add new user
+      user:
+        name: betty
+        groups: sudo
+        shell: /bin/bash
+
+    - name: add ssh key
+      authorized_key:
+        user: betty
+        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
