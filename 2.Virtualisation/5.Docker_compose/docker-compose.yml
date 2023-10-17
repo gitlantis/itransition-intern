@@ -1,0 +1,33 @@
+services:
+  nginx:
+    build:
+      context: ./
+      dockerfile: Dockernginx
+    ports:
+      - 80:80
+    volumes:
+      - ./files:/usr/share/nginx/html
+    networks:
+      - private_network
+    depends_on:
+      - db
+
+  db:
+    build:
+      context: ./
+      dockerfile: Dockerdb
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    env_file:
+      - .env
+    networks:
+      - private_network
+
+networks:
+  private_network:
