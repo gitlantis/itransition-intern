@@ -16,6 +16,7 @@ $ ssh -o StrictHostKeyChecking=no -i .vagrant\machines\vm2\virtualbox\private_ke
 ```
 
 we have to install ansible on linux machine first.
+
 In my PC ```Kali Linux``` is installed as a ```WSL``` that's why my next actions will be done from there.
 
 machines are running
@@ -143,7 +144,9 @@ I am modifiying anssible script from last task
 and for disk and log clean automation using my olready prepeared script from Linux task
 
 Image describes in a virtual machine created cronjob with the period of 1 min, this period is to demonstrate how it is working.
+
 In ```/var/log``` file created ```disk_logger_clean.log``` which you can see content of file in the last command. We should have one more fiele ```disk_logger_warn.log```, but why it is not exist? 
+
 Because of there is no any mounted devices in VM
 
 ![Alt text](../assets/crontab_result.png)
