@@ -62,9 +62,10 @@ and this is information about pod
 ![Alt text](../assets/describe_pod.png)
 
 how about logs? we should know what is going on backgraund:
-if we give ```-f``` argument to ```kubectl log``` we can open strem to continiously listen logs. 
 
 ![Alt text](../assets/kubectl_logs.png)
+
+if we give ```-f``` argument to ```kubectl log``` we can open strem to continiously listen logs. 
 
 sometimeses we will want to connect remotely to the pod, 
 we can do this as following:
