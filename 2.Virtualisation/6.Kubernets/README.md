@@ -49,7 +49,7 @@ On my computer already Kubernetes is installed and running, that's why I can tes
 
 ![Alt text](../assets/kubectl_aply.png)
 
-```$ cubectl get all``` gives all informations about pod and service at once.
+```$ cubectl get all``` gives all informations about pods and services at once.
 
 as you can see pod name is ```nginx-deployment-57d84f57dc-t9gvw``` ans service name is ```my-service```
 
