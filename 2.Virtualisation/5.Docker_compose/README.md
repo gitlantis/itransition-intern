@@ -58,13 +58,13 @@ networks:
 
 as you can see every image connecting over ```private_network```
 
-```docker compose ps```
+```$ docker compose ps```
 
 ```$ docker compose up```
 
 ![Alt text](../assets/docker_compose_ps.png)
 
-```docker exec -ti 5docker_compose-nginx-1 /bin/bash```
+```$ docker exec -ti 5docker_compose-nginx-1 /bin/bash```
 
 ![Alt text](../assets/docker_connect_bash.png)
 
