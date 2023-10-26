@@ -27,13 +27,14 @@ go to ```vagranfile``` directory:
 
 ```$ cd {Vagranfile dir}```
 
-we should crearte disabled ```ansible.cfg``` that we can modify it later
+we should create disabled ```ansible.cfg``` that we can modify it later
 
 ```$ ansible-config init --disabled > ansible.cfg```
 
 ###### Inventory file with ssh keys
 
-```$ sudo nano hosts```
+```$ nano hosts```
+
 ```bash
 [servers]
 vm1 ansible_host=192.168.1.101 ansible_ssh_private_key_file=.vagrant/machines/vm1/virtualbox/private_key
@@ -53,7 +54,7 @@ to check inventory we should run following command:
 
 test connections with hosts:
 
-```$ ansible all -m ping -u root```
+```$ ansible all -m ping -u vagrant```
 ansible ping also working correctly:
 
 ![Alt text](../assets/ansible_ping.png)
@@ -124,7 +125,6 @@ all stepps passed successfully.
 as we planned running nginx server
 
 ![Alt text](../assets/nginx_ansible.png)
-
 
 ### vm2
 and here is apache

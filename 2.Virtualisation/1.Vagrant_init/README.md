@@ -1,4 +1,4 @@
-# Vagrant sumary
+# Vagrant summary
 first of all we should create a directory,
 
 ```cmd
@@ -168,4 +168,5 @@ PS C:\Users\xxxxx\Documents\Projects\Vagrant\proj1> vagrant destroy
 ==> default: Destroying VM and associated drives...
 ```
 and it is gone now:
+
 ![Alt text](../assets/image-2.png)

@@ -92,7 +92,6 @@ def RemoveContainers(){
             docker rm $N
         done
     '''
-    
 }
 
 def PushImage(){

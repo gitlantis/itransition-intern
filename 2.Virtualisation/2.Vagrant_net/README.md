@@ -22,8 +22,11 @@ Vagrant.configure("2") do |config|
     end
   end
 ```
+
 #### Script
+
 script ```install-nginx.sh``` is outside of two machine scopes, the reason is we this script is common for all machine.
+
 ```bash
 #!/usr/bin/env bash
 
@@ -34,17 +37,23 @@ sudo service nginx start
 ```
 this cript installes ```nginx``` and saves ```Hello World``` to nginx's default index file.
 now our machine is ready to start, you can find building logs in ```vagrant_up.log``` file
+
 ![Alt text](../assets/netvms.png)
 
 #### configurations
 As we know cpus were different for both machine.
 for first machine ```1 CPU``` was configured
+
 ![Alt text](../assets/cpu101.png)
 
 and for second machine ```2 CPU``` was configured
+
 ![Alt text](../assets/cpu102.png)
+
 and rams were similar for moth machine:
+
 ![Alt text](../assets/ram101.png)
+
 ![Alt text](../assets/ram102.png)
 
 #### Network
@@ -196,6 +205,9 @@ ping is working
 
 and this is our result:
 #### vm1
+
 ![Alt text](../assets/net101.png)
+
 #### vm2
+
 ![Alt text](../assets/net102.png)
