@@ -1,0 +1,39 @@
+---
+- name: Configuring Reverse proxy
+  hosts: nginx-reverse
+  remote_user: vagrant  
+  become: yes 
+
+  tasks:
+    - name: Update APT package cache
+      apt:
+        update_cache: yes
+
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Copy nginx-reverse.conf to /etc/nginx/sites-available/default
+      copy:
+        src: configs/nginx-reverse.conf
+        dest: /etc/nginx/sites-available/default
+
+    - name: Copy clean.sh to the home directory
+      copy:
+        src: scripts/clean.sh
+        dest: /home/vagrant/clean.sh
+        mode: 'a+x'
+
+    - name: Add a cron job to clean Nginx cache
+      cron:
+        name: Clean Nginx cache
+        minute: 0
+        hour: 0
+        job: "/home/vagrant/clean.sh -s +5M -d 14"
+        state: present
+
+    - name: Restart Nginx service
+      service:
+        name: nginx
+        state: restarted

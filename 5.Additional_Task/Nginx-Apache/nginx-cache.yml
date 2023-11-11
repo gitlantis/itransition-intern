@@ -1,0 +1,59 @@
+---
+- name: Install and Configure Nginx cache 
+  hosts: nginx-cache
+  remote_user: vagrant  
+  become: yes
+
+  tasks:
+    - name: Update APT package cache
+      apt:
+        update_cache: yes
+
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Create directory for Nginx cache
+      file:
+        path: /var/cache/nginx
+        state: directory
+        mode: '0777'
+    
+    - name: Set ownership of /var/cache/nginx
+      ansible.builtin.file:
+        path: /var/cache/nginx
+        owner: www-data
+        group: www-data
+        recurse: yes
+
+    # - name: Update Nginx configuration for cache
+    #   lineinfile:
+    #     path: /etc/nginx/nginx.conf
+    #     insertafter: '^http {'
+    #     line:  'proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=my_cache:10m max_size=100m inactive=1d;'
+    #     state: present
+
+    - name: Copy nginx-cache.conf to /etc/nginx/sites-available/default
+      copy:
+        src: configs/nginx-cache.conf
+        dest: /etc/nginx/sites-available/default
+
+    - name: Copy clean.sh to the home directory
+      copy:
+        src: scripts/clean.sh
+        dest: /home/vagrant/clean.sh
+        mode: 'a+x'
+
+    - name: Add a cron job to clean cache
+      cron:
+        name: Clean NGINX cache
+        minute: 0
+        hour: 0
+        job: "/home/vagrant/clean.sh -s +5M -d 14"
+        state: present
+
+    - name: Retart Nginx service
+      service:
+        name: nginx
+        state: restarted

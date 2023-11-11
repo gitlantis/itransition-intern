@@ -1,0 +1,84 @@
+---
+- name: Configure Apache with Cache
+  hosts: apache-cache
+  remote_user: vagrant
+  become: yes
+
+  tasks:
+    - name: Update APT package cache
+      apt:
+        update_cache: yes
+
+    - name: Install Apache2 and Apache2 utilities
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - apache2
+        - apache2-utils
+
+    - name: Create cache directory
+      file:
+        path: /var/cache/apache_cache
+        state: directory
+        mode: '0777'
+
+    - name: Set ownership of /var/cache/nginx
+      ansible.builtin.file:
+        path: /var/cache/nginx
+        owner: www-data
+        group: www-data
+        recurse: yes
+
+    - name: Copy apache-cache.conf to /etc/apache2/sites-available/000-default.conf
+      copy:
+        src: configs/apache-cache.conf
+        dest: /etc/apache2/sites-available/000-default.conf
+
+    - name: Replace before the expression till the begin of the file (requires Ansible >= 2.4)
+      ansible.builtin.replace:
+        path: /etc/apache2/ports.conf
+        regexp: 'Listen 80\n'
+        replace: 'Listen 8080\n'
+
+    # - name: Enable Apache modules
+    #   apache2_module:
+    #     state: present
+    #     name: "{{ item }}"
+    #   loop:
+    #     - cache
+    #     - cache_disk
+    #     - headers
+
+    - name: Enable Apache2 cache and cache_disk modules
+      command: "a2dismod {{ item }}"
+      with_items:
+        - proxy_http2
+        
+    - name: Enable Apache2 cache and cache_disk modules
+      command: "a2enmod {{ item }}"
+      with_items:
+        - cache
+        - cache_disk
+        - headers
+        - mpm_event     
+        - proxy_http 
+        
+    - name: Copy clean.sh to the home directory
+      copy:
+        src: scripts/clean.sh
+        dest: /home/vagrant/clean.sh
+        mode: 'a+x'
+        
+    - name: Add a cron job to clean Apache cache
+      cron:
+        name: Clean Apache cache
+        minute: 0
+        hour: 0
+        job: "/home/vagrant/clean.sh -s +5M -d 14"
+        state: present
+
+    - name: Restart Apache service
+      service:
+        name: apache2
+        state: restarted

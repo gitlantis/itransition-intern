@@ -260,12 +260,3 @@ done
 sudo crontab -e
 0 * * * * /path/to/your/script.sh -p 20 -d 1
 ```
-
-
-
-
-
-
-
-
-
