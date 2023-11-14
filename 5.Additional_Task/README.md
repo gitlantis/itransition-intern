@@ -324,3 +324,44 @@ and resize the file system:
 now our volume is taking 2GB size:
 
 ![Alt text](assets/image_006.png)
+
+# Jenkins
+
+I have created Jenkins repository: https://github.com/gitlantis/5_task.git
+
+repository contains only Jenkins file:
+```jenkins
+pipeline {
+    agent any    
+    stages {
+        stage('Deploy to Staging') {
+            steps {
+                sshagent(['jenkins_key']) {
+                    sh 'ssh -o StrictHostKeyChecking=no -L $(pwd)/docker.sock:/var/run/docker.sock ubuntu@172.31.27.102 "docker run hello-world"'
+                }
+            }        
+        }
+    }
+}
+
+```
+
+generate ssh key in a jenkins server:
+
+```ssh-keygen -t rsa -b 4096 -f jenkins_key```
+
+Copy ```jenkins_key``` public key into trusted keys list in ```worker-docker``` server
+
+Create ```Global credentials``` first and copy ```jenkins_key.pem``` into New credentials
+
+![Alt text](assets/image-j4.png)
+
+
+We can run it on Jenkis server using ```Multibranch pipeline```
+
+![Alt text](assets/image-j3.png)
+
+
+and this is our final result
+
+![Alt text](assets/image-j6.png)
