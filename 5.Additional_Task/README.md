@@ -356,6 +356,7 @@ Create ```Global credentials``` first and copy ```jenkins_key.pem``` into New cr
 
 ![Alt text](assets/image-j4.png)
 
+I have used private IP ```172.31.27.102``` of ```worker-docker``` server that it will be internal connection in the AWS
 
 We can run it on Jenkis server using ```Multibranch pipeline```
 
