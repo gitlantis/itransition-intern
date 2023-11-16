@@ -795,25 +795,11 @@ and this is all result from remote server
 
 First of all we have to create launche template for oaur Autoscaling group
 
-<!-- now we have to configure our nginx instance, specify security group traffic from ELB
-
-on the network settings, I am choosing ```web-sg``` group
-
-![Alt text](assets/image-54.png) -->
-
-<!-- this security group is configured to forward all traffic from ELB
-
-![Alt text](assets/image-53.png) -->
-
 first of all create launch template 
-
-<!-- In this image choosen ```subnet1``` which this earlier created subnet to work with load balancer. -->
 
 security group ```web-sg``` which http traffic will be forwarded from ourl eralier created ELB
 
 other configurations will be default, we will configure subnet while configureing autoscaling group
-
-<!-- ![Alt text](assets/image-60.png) -->
 
 ![Alt text](assets/image-62.png)
 
@@ -859,3 +845,235 @@ just we have to update security group to forward traffic from autoscaling gorup
 ![Alt text](assets/image-59.png)
 
 I am having some trouble with connection, I have to fix this!!!
+
+# 2 Elastic Beankstalk
+I choose .net core starter for this task
+
+Repositroy link: https://github.com/gitlantis/Docker-aws-test.git
+
+Create aws ```Dockerfile.aws.json```
+
+```json
+{
+  "AWSEBDockerrunVersion": 2,
+  "volumes": [
+    {
+      "name": "nginx-conf",
+      "host": {
+        "sourcePath": "/var/app/current/config"
+      }
+    }
+  ],
+  "containerDefinitions": [
+    {
+      "name": "dotnet-app",
+      "image": "mcr.microsoft.com/dotnet/samples:aspnetapp",
+      "essential": true,
+        "memory": 500,
+      "portMappings": [
+        {
+          "hostPort": 5000,
+          "containerPort": 5000
+        }
+      ],
+      "environment": [
+        {
+          "name": "ASPNETCORE_ENVIRONMENT",
+        "value": "Development"
+        },
+        {
+          "name": "ASPNETCORE_URLS",
+        "value": "http://+:5000"
+        }
+      ]
+    },
+    {
+      "name": "nginx",
+      "image": "nginx:latest",
+      "essential": true,
+        "memory": 128,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 80
+        }
+      ],
+      "links": ["dotnet-app"],
+      "mountPoints": [
+        {
+          "sourceVolume": "nginx-conf",
+          "containerPath": "/etc/nginx/conf.d",
+          "readOnly": true
+        }
+      ]
+    }
+  ]
+}
+```
+
+create nginx configurationto forward traffic to dotnetcore app
+
+```yml
+server {
+    listen 80;
+    server_name _;
+
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_buffering off;
+
+    location / {
+        proxy_pass http://dotnet-app:5000;
+    }
+
+    location /nginx_status {
+        stub_status on;
+        access_log off;
+        allow 127.0.0.1;
+        deny all;
+    }
+```
+
+initalize benstack into repository
+
+```eb init```
+
+create application and environment for deployment app
+
+```eb create```
+
+re deploy new commit s
+
+```eb deploy```
+
+<details>
+<summary>result:</summary>
+
+```bash
+xxxxxxx@xxxxxxx:~/Projects/Docker-aws-test$ git push
+Enumerating objects: 7, done.
+Counting objects: 100% (7/7), done.
+Delta compression using up to 16 threads
+Compressing objects: 100% (4/4), done.
+Writing objects: 100% (5/5), 836 bytes | 836.00 KiB/s, done.
+Total 5 (delta 0), reused 0 (delta 0), pack-reused 0
+remote: Validating objects: 100%
+To https://git-codecommit.us-west-2.amazonaws.com/v1/repos/origin
+   cc44e260..8b5f999f  main -> main
+xxxxxxx@xxxxxxx:~/Projects/Docker-aws-test$ eb init
+
+Select a default region
+1) us-east-1 : US East (N. Virginia)
+2) us-west-1 : US West (N. California)
+3) us-west-2 : US West (Oregon)
+4) eu-west-1 : EU (Ireland)
+5) eu-central-1 : EU (Frankfurt)
+6) ap-south-1 : Asia Pacific (Mumbai)
+7) ap-southeast-1 : Asia Pacific (Singapore)
+8) ap-southeast-2 : Asia Pacific (Sydney)
+9) ap-northeast-1 : Asia Pacific (Tokyo)
+10) ap-northeast-2 : Asia Pacific (Seoul)
+11) sa-east-1 : South America (Sao Paulo)
+12) cn-north-1 : China (Beijing)
+13) cn-northwest-1 : China (Ningxia)
+14) us-east-2 : US East (Ohio)
+15) ca-central-1 : Canada (Central)
+16) eu-west-2 : EU (London)
+17) eu-west-3 : EU (Paris)
+18) eu-north-1 : EU (Stockholm)
+19) eu-south-1 : EU (Milano)
+20) ap-east-1 : Asia Pacific (Hong Kong)
+21) me-south-1 : Middle East (Bahrain)
+22) il-central-1 : Middle East (Israel)
+23) af-south-1 : Africa (Cape Town)
+24) ap-southeast-3 : Asia Pacific (Jakarta)
+25) ap-northeast-3 : Asia Pacific (Osaka)
+(default is 3): 3
+
+
+Select an application to use
+1) eb-docker-nginx-proxy
+2) [ Create new Application ]
+(default is 2):
+
+
+Enter Application Name
+(default is "Docker-aws-test"):
+Application Docker-aws-test has been created.
+
+It appears you are using Docker. Is this correct?
+(Y/n): Y
+Select a platform branch.
+1) Docker running on 64bit Amazon Linux 2023
+2) ECS running on 64bit Amazon Linux 2023
+3) Docker running on 64bit Amazon Linux 2
+4) ECS running on 64bit Amazon Linux 2
+(default is 1): 2
+
+Do you wish to continue with CodeCommit? (Y/n): n
+Do you want to set up SSH for your instances?
+(Y/n): Y
+
+Select a keypair.
+1) aws-eb
+2) [ Create new KeyPair ]
+(default is 1): 1
+
+xxxxxxx@xxxxxxx:~/Projects/Docker-aws-test$ eb create
+Enter Environment Name
+(default is Docker-aws-test-dev):
+Enter DNS CNAME prefix
+(default is Docker-aws-test-dev):
+
+Select a load balancer type
+1) classic
+2) application
+3) network
+(default is 2): 2
+
+
+Would you like to enable Spot Fleet requests for this environment? (y/N): N
+Creating application version archive "app-8b5f-231116_125055242971".
+Uploading Docker-aws-test/app-8b5f-231116_125055242971.zip to S3. This may take a while.
+Upload Complete.
+Environment details for: Docker-aws-test-dev
+  Application name: Docker-aws-test
+  Region: us-west-2
+  Deployed Version: app-8b5f-231116_125055242971
+  Environment ID: e-52sccvqn3r
+  Platform: arn:aws:elasticbeanstalk:us-west-2::platform/ECS running on 64bit Amazon Linux 2023/4.0.0
+  Tier: WebServer-Standard-1.0
+  CNAME: Docker-aws-test-dev.us-west-2.elasticbeanstalk.com
+  Updated: 2023-11-16 07:51:01.177000+00:00
+Printing Status:
+2023-11-16 07:50:59    INFO    createEnvironment is starting.
+2023-11-16 07:51:01    INFO    Using elasticbeanstalk-us-west-2-252083451373 as Amazon S3 storage bucket for environment data.
+2023-11-16 07:51:21    INFO    Created security group named: sg-003aaf01beccb8301
+2023-11-16 07:51:21    INFO    Created security group named: awseb-e-52sccvqn3r-stack-AWSEBSecurityGroup-12NZXQ83V6L1B
+2023-11-16 07:51:36    INFO    Created Auto Scaling launch configuration named: awseb-e-52sccvqn3r-stack-AWSEBAutoScalingLaunchConfiguration-ypI4NZBV32tn
+2023-11-16 07:51:36    INFO    Created target group named: arn:aws:elasticloadbalancing:us-west-2:252083451373:targetgroup/awseb-AWSEB-VLTPKQE9CGON/fbb2d3993769f1d0
+2023-11-16 07:51:52    INFO    Created Auto Scaling group named: awseb-e-52sccvqn3r-stack-AWSEBAutoScalingGroup-yJ0j7LnYTJ22
+2023-11-16 07:51:52    INFO    Waiting for EC2 instances to launch. This may take a few minutes.
+2023-11-16 07:51:52    INFO    Created Auto Scaling group policy named: arn:aws:autoscaling:us-west-2:252083451373:scalingPolicy:d4a764c6-fbc7-49a8-b319-6070b2122c40:autoScalingGroupName/awseb-e-52sccvqn3r-stack-AWSEBAutoScalingGroup-yJ0j7LnYTJ22:policyName/awseb-e-52sccvqn3r-stack-AWSEBAutoScalingScaleDownPolicy-wVL4rBehQ4fV
+2023-11-16 07:51:52    INFO    Created Auto Scaling group policy named: arn:aws:autoscaling:us-west-2:252083451373:scalingPolicy:4a155c93-9b91-4d0a-b47c-0ab35c2f72a3:autoScalingGroupName/awseb-e-52sccvqn3r-stack-AWSEBAutoScalingGroup-yJ0j7LnYTJ22:policyName/awseb-e-52sccvqn3r-stack-AWSEBAutoScalingScaleUpPolicy-LcNXg8FcGtqv
+2023-11-16 07:51:52    INFO    Created CloudWatch alarm named: awseb-e-52sccvqn3r-stack-AWSEBCloudwatchAlarmLow-IXPc6aEEMT5N
+2023-11-16 07:51:52    INFO    Created CloudWatch alarm named: awseb-e-52sccvqn3r-stack-AWSEBCloudwatchAlarmHigh-IkNY7UvJFtFW
+2023-11-16 07:53:58    INFO    Created load balancer named: arn:aws:elasticloadbalancing:us-west-2:252083451373:loadbalancer/app/awseb--AWSEB-0FGsFnjqiwdR/836639fe8f5a57b0
+2023-11-16 07:53:58    INFO    Created Load Balancer listener named: arn:aws:elasticloadbalancing:us-west-2:252083451373:listener/app/awseb--AWSEB-0FGsFnjqiwdR/836639fe8f5a57b0/0f6d6410048f6611
+2023-11-16 07:55:59    INFO    Successfully launched environment: Docker-aws-test-dev
+```
+
+</details>
+
+![Alt text](assets/image-1eb.png)
+
+web page:
+
+![Alt text](assets/image_eb.png)
+
+# 3 working with containers
+this task is already done in ```5.Additional task``` punk ```Jenkins```
+
+script may be a little bit different.
+
