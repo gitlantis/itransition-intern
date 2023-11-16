@@ -362,7 +362,6 @@ We can run it on Jenkis server using ```Multibranch pipeline```
 
 ![Alt text](assets/image-j3.png)
 
-
 and this is our final result
 
 ![Alt text](assets/image-j6.png)
