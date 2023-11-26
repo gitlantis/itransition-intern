@@ -6,5 +6,4 @@
 **/Migrations
 **/appsettings.json
 **/dist**.*
-**/.vagrant
-**/.env
+**/.*

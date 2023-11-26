@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  WebSecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+  BalancerSecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+  PublicSubnet1Id: 
+    Type: AWS::EC2::Subnet::Id
+  PublicSubnet2Id: 
+    Type: AWS::EC2::Subnet::Id
+
+Resources:
+  LaunchConfiguration:
+    Type: "AWS::AutoScaling::LaunchConfiguration"
+    Properties:
+      InstanceType: "t2.micro"
+      ImageId: "ami-06dd92ecc74fdfb36"
+      KeyName: "balancer-key"
+      SecurityGroups:
+        - !Ref WebSecurityGroupId
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          apt update -y
+          apt install -y nginx
+          echo "<br><h1> Instance <br> <b>$(ip address | grep 10.0)</b> </h1>" >> /var/www/html/index.html
+          service nginx start
+
+  AutoScalingGroup:
+    Type: "AWS::AutoScaling::AutoScalingGroup"
+    Properties:
+      LaunchConfigurationName: !Ref LaunchConfiguration
+      MinSize: 2
+      MaxSize: 4
+      DesiredCapacity: 2
+      VPCZoneIdentifier:
+        - !Ref PublicSubnet1Id
+        - !Ref PublicSubnet2Id
+      LoadBalancerNames:
+        - !Ref LoadBalancer
+
+  LoadBalancer:
+    Type: "AWS::ElasticLoadBalancing::LoadBalancer"
+    Properties:
+      Subnets:
+        - !Ref PublicSubnet1Id
+        - !Ref PublicSubnet2Id
+      Listeners:
+        - LoadBalancerPort: 80
+          InstancePort: 80
+          Protocol: "HTTP"
+      HealthCheck:
+        Target: "HTTP:80/"
+        HealthyThreshold: "2"
+        UnhealthyThreshold: "2"
+        Interval: "5"
+        Timeout: "3"
+      SecurityGroups:
+        - !Ref BalancerSecurityGroupId
+
+Outputs:
+  LoadBalancerDNSName:
+    Value: !GetAtt LoadBalancer.DNSName
+    Description: "DNS name of the created LoadBalancer"

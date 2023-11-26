@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Resources:
+  NetworkingStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: "https://cf-templates-w0mknhciy5ui-eu-central-1.s3.eu-central-1.amazonaws.com/networking.yml"
+
+  SecurityGroupStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: NetworkingStack
+    Properties:
+      TemplateURL: "https://cf-templates-w0mknhciy5ui-eu-central-1.s3.eu-central-1.amazonaws.com/security-group.yml"
+      Parameters:
+        VPCId: !GetAtt NetworkingStack.Outputs.VPCId
+
+  InstancesAndLoadBalancer:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: [SecurityGroupStack, NetworkingStack]
+    Properties:
+      TemplateURL: "https://cf-templates-w0mknhciy5ui-eu-central-1.s3.eu-central-1.amazonaws.com/instances-and-lb.yml"
+      Parameters:
+        WebSecurityGroupId: !GetAtt SecurityGroupStack.Outputs.WebSecurityGroupId
+        BalancerSecurityGroupId: !GetAtt SecurityGroupStack.Outputs.BalancerSecurityGroupId
+        PublicSubnet1Id: !GetAtt NetworkingStack.Outputs.PublicSubnet1Id
+        PublicSubnet2Id: !GetAtt NetworkingStack.Outputs.PublicSubnet2Id
